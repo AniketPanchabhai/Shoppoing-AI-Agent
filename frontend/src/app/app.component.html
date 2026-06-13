@@ -1,0 +1,86 @@
+<div class="app-container">
+  <!-- Header -->
+  <header class="app-header">
+    <h1>🛍️ Shopping Agent Assistant</h1>
+    <button (click)="resetConversation()" class="reset-btn">Reset Chat</button>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Chat Window -->
+    <section class="chat-section">
+      <div class="chat-messages" id="chatMessages">
+        <div *ngFor="let msg of messages" [ngClass]="msg.role === 'user' ? 'user-message' : 'assistant-message'">
+          <div class="message-content">
+            {{ msg.content }}
+          </div>
+        </div>
+
+        <div *ngIf="isLoading" class="loading-indicator">
+          <span class="loader"></span> Agent is thinking...
+        </div>
+      </div>
+
+      <!-- Input Area (Fixed at Bottom) -->
+      <div class="input-area">
+        <textarea 
+          [(ngModel)]="userInput" 
+          (keyup.enter)="sendMessage()"
+          placeholder="Type your message... (e.g., 'Show me TVs above ₹50,000')"
+          class="message-input">
+        </textarea>
+
+        <div class="input-controls">
+          <button (click)="sendMessage()" [disabled]="isLoading || !userInput.trim()" class="send-btn">
+            Send
+          </button>
+
+          <label class="upload-btn">
+            📸 Upload Image
+            <input type="file" 
+                   accept="image/*" 
+                   (change)="onFileSelected($event)" 
+                   style="display:none;">
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Sidebar -->
+    <aside class="product-sidebar" [ngClass]="selectedProducts?.length > 0 ? 'show' : 'hide'">
+      <div *ngIf="selectedProducts && selectedProducts.length > 0">
+        <h3>💡 Products</h3>
+        <div class="product-list">
+          <div *ngFor="let product of selectedProducts" 
+               class="product-card"
+               (click)="selectProduct(product.id)">
+            <div class="product-name">{{ product.name }}</div>
+            <div class="product-brand">{{ product.brand }}</div>
+            <div class="product-price">₹{{ product.price }}</div>
+            <div class="product-rating">⭐ {{ product.rating }}</div>
+            <div class="product-stock" [ngClass]="product.inStock ? 'in-stock' : 'out-of-stock'">
+              {{ product.inStock ? 'In Stock' : 'Out' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Order Confirmation Popup -->
+  <div *ngIf="showOrderConfirmation" class="order-confirmation-popup">
+    <div class="confirmation-content">
+      <div class="confirmation-header">
+        <h2>✅ Order Confirmed!</h2>
+        <button (click)="closeOrderConfirmation()" class="close-btn">×</button>
+      </div>
+      <div class="confirmation-details">
+        <p><strong>Order ID:</strong> {{ orderConfirmation?.orderId }}</p>
+        <p><strong>Product:</strong> {{ orderConfirmation?.productName }}</p>
+        <p><strong>Quantity:</strong> {{ orderConfirmation?.quantity }}</p>
+        <p><strong>Total Price:</strong> ₹{{ orderConfirmation?.totalPrice }}</p>
+        <p><strong>Estimated Delivery:</strong> {{ orderConfirmation?.estimatedDelivery }}</p>
+      </div>
+    </div>
+  </div>
+</div>
